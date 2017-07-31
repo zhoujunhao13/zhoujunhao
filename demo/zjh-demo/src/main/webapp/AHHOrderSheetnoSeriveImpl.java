@@ -75,9 +75,21 @@ public class AHHOrderSheetnoSeriveImpl extends BasicComponentService<OrderHeader
 	private String ahhURL;
 	private String wsdlUrl;
 	private String relateUrl;
+	private String dicturl;
 	
 	
 	
+	
+	public String getDicturl() {
+		return dicturl;
+	}
+
+
+	public void setDicturl(String dicturl) {
+		this.dicturl = dicturl;
+	}
+
+
 	public String getRelateUrl() {
 		return relateUrl;
 	}
@@ -319,6 +331,15 @@ public class AHHOrderSheetnoSeriveImpl extends BasicComponentService<OrderHeader
 		orderHeader.setConvention(jsonHeader.getString("convention"));
 		orderHeader.setIs_send("0"); //是否向X-Store传订单成功
 		//获取自主收银的付款信息
+		MultivaluedMap<String, String> urlParams = new MultivaluedMapImpl();
+		urlParams.add("method", "omd.dict.search");
+		urlParams.add("session",URLEncoder.encode(JSON.toJSONString(session),"UTF-8"));
+		JSONObject paramJson= new JSONObject();
+		paramJson.put("dict_group_code", "pay_mode");
+		paramJson.put("page_size", 9999);
+		JSONObject res = OmdRestUtils.doPost(dicturl, urlParams, paramJson.toJSONString());
+		JSONArray dicts = res.getJSONArray("dict");
+		
 		JSONArray jsonpaymoney = jsonparam.getJSONArray("pay_money");
 		JSONArray jsonpayacc = jsonparam.getJSONArray("pay_account");
 		List<JSONObject> paystyle = new ArrayList<JSONObject>();
@@ -332,6 +353,16 @@ public class AHHOrderSheetnoSeriveImpl extends BasicComponentService<OrderHeader
 				//付款金额
 				String money = paymoney.getString("money");
 				payinfo.put("money", money);
+				for(int k=0; k<dicts.size(); k++){
+					JSONObject dict = dicts.getJSONObject(k);
+					String d_code = dict.getString("code");
+					if(code.equals(d_code)){
+						String tendtype = dict.getString("sname");
+						String tendid = dict.getString("scode");
+						payinfo.put("tendtype", tendtype);
+						payinfo.put("tendid", tendid);
+					}
+				}
 				//获取付款账号
 				if(jsonpayacc != null && jsonpayacc.size()>0){
 					for(int j=0; j<jsonpayacc.size(); j++){
@@ -725,7 +756,7 @@ public class AHHOrderSheetnoSeriveImpl extends BasicComponentService<OrderHeader
 			//获取CustomerID
 			String CustomerID = resbody.getElementsByTagName("CustomerID").item(0)
 					.getTextContent();;
-			System.out.println(CustomerID);
+			
 			//获取AlternateID
 			String AlternateID = "";
 			List<String> AlternateIDs = new ArrayList<String>();
@@ -737,7 +768,7 @@ public class AHHOrderSheetnoSeriveImpl extends BasicComponentService<OrderHeader
 					}
 				}
 			}
-			System.out.println(AlternateIDs);
+			
 			//-----------------------------------
 						
 			JSONObject returnJson = new JSONObject();
@@ -929,7 +960,14 @@ public class AHHOrderSheetnoSeriveImpl extends BasicComponentService<OrderHeader
 		}
 		return ServiceResponse.buildSuccess("success");
 	}
-	
+	/**
+	 * 向relate传递从X-store获取到的积分计算规则
+	 * @param session
+	 * @param jsonparam
+	 * @return
+	 * @throws Exception
+	 */
+
 	public ServiceResponse toPostTransaction(ServiceSession session, JSONObject jsonparam) throws Exception {
 		try{
 			if (session == null)
@@ -940,9 +978,9 @@ public class AHHOrderSheetnoSeriveImpl extends BasicComponentService<OrderHeader
 						ResponseCode.Exception.PARAM_IS_EMPTY);
 			
 			SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
-			SimpleDateFormat format2 = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ss.SSS");
-			String date1 = format1.format(new Date());
-			String date2 = format2.format(new Date());
+			SimpleDateFormat format2 = new SimpleDateFormat("HH:mm:ss.SSS");
+			//String date1 = format1.format(new Date());
+			//String date2 = format2.format(new Date());
 			
 			String ns = "http://v1_0.poslog.webservices.csx.dtv.com/";
 			// 1、创建服务(Service)
@@ -958,10 +996,10 @@ public class AHHOrderSheetnoSeriveImpl extends BasicComponentService<OrderHeader
 			// 3、创建SOAPMessage
 			SOAPMessage msg = MessageFactory.newInstance(
 					SOAPConstants.SOAP_1_1_PROTOCOL).createMessage();
+			msg.setProperty(SOAPMessage.CHARACTER_SET_ENCODING, "utf-8");
 			SOAPEnvelope envelope = msg.getSOAPPart().getEnvelope();
 			
-			SOAPElement v1 = envelope.addNamespaceDeclaration("v1",
-					"http://v1_0.poslog.webservices.csx.dtv.com/");
+			envelope.addNamespaceDeclaration("v1", "http://v1_0.poslog.webservices.csx.dtv.com/");
 			
 			SOAPBody body = envelope.getBody();
 			envelope.setPrefix("soapenv");
@@ -970,26 +1008,266 @@ public class AHHOrderSheetnoSeriveImpl extends BasicComponentService<OrderHeader
 			//envelope.removeChild(envelope.getHeader());
 			body.setPrefix("soapenv");
 			// 4、创建QName来指定消息中传递数据
-			QName ename = new QName("", "postTransaction", "v1");
+			QName ename = new QName(ns, "postTransaction", "v1");
 			SOAPBodyElement ele = body.addBodyElement(ename);
 			
 			SOAPElement transaction = SOAPFactory.newInstance().createElement("transaction");
 			transaction.setAttribute("CancelFlag", "false");
 			transaction.setAttribute("Action", "PostTransaction,CalcProformaPoints,PointRecovery");
 			transaction.setAttribute("TransactionType", "RETAIL_SALE");
+			transaction.addChildElement("RetailStoreID").setValue("102");
 			
-			transaction.addChildElement("RetailStoreID").setValue("120");
-			transaction.addChildElement("WorkstationID").setValue("99");
-			transaction.addChildElement("SequenceNumber").setValue("117");
-			transaction.addChildElement("BusinessDayDate").setValue("120");
-			transaction.addChildElement("BeginDateTime").setValue("120");
-			transaction.addChildElement("EndDateTime").setValue("120");
+			String orderId = jsonparam.getString("sheetno");	//订单号
+			System.out.println(orderId);
+			//查出订单的信息
+			StringBuffer total = new StringBuffer();
+			JSONObject json = new JSONObject();
+			json.put("sheetno", orderId);
+			List<OrderHeaderBean> orderlist = null;
+			List<OrderDetailBean> detiallist = null;
+			List<JSONObject> paystyle = null;
+			String time = "";
+			String time2 = "";
+			orderlist = doSearch(json,OrderHeaderBean.class,null,true,total);
+			if(orderlist.size() > 0){
+				for(int i=0; i<orderlist.size(); i++){
+					OrderHeaderBean order = orderlist.get(i);
+					String org_code = order.getOrg_code();
+					Date order_time = order.getOrder_time();
+					String oid = String.valueOf(order.getOid());
+					oid = oid.substring(oid.length()-8, oid.length());
+					paystyle = order.getPaystyle();
+					time = format1.format(order_time);
+					String time1 = format2.format(order_time);
+					time2 = time + "T" + time1;
+					System.out.println(time2);
+					
+					transaction.addChildElement("WorkstationID").setValue(org_code);	//org_code
+					transaction.addChildElement("SequenceNumber").setValue(oid);	//id
+					//transaction.addChildElement("SequenceNumber").setValue("117");	//id
+					transaction.addChildElement("BusinessDayDate").setValue(time);	//下单时间
+					transaction.addChildElement("BeginDateTime").setValue(time2);
+					transaction.addChildElement("EndDateTime").setValue(time2);
+				}
+			}
+		
 			transaction.addChildElement("OperatorID").setValue("100");
 			transaction.addChildElement("CurrencyCode").setValue("CNY");
-						
+			
+			SOAPElement retailTransaction = SOAPFactory.newInstance().createElement("RetailTransaction");
+			retailTransaction.setAttribute("Version", "2.1");
+			retailTransaction.setAttribute("TypeCode", "Transaction");
+			retailTransaction.setAttribute("TransactionStatus", "Delivered");
+			//transaction.addChildElement(retailTransaction);
+			
+			int num = 0;
+			//商品明细
+			detiallist = doSearch(json, OrderDetailBean.class,null,true,total);
+			if(detiallist.size() > 0){
+				for(int i=0; i<detiallist.size(); i++){
+					num = i + 1;
+					OrderDetailBean detail = detiallist.get(i);
+					String item_code = detail.getItem_code();
+					String sale_price = String.valueOf(detail.getSale_price());	//元单价
+					double transaction_price = detail.getTransaction_price();
+					String zongjia = String.valueOf(transaction_price);
+					double sale_qty = detail.getSale_qty();
+					String unit_price = String.valueOf(transaction_price/sale_qty);	//现单价
+					String qty = String.valueOf(sale_qty);	//数量
+					
+					SOAPElement lineItem = SOAPFactory.newInstance().createElement("LineItem");
+					lineItem.setAttribute("VoidFlag", "false");
+					lineItem.addChildElement("SequenceNumber").setValue(String.valueOf(i+1));
+					lineItem.addChildElement("BeginDateTime").setValue(time2);
+					lineItem.addChildElement("EndDateTime").setValue(time2);
+					
+					SOAPElement sale = SOAPFactory.newInstance().createElement("Sale");
+					sale.setAttribute("ItemType", "Stock");
+					sale.setAttribute("Action", "Completed");
+					sale.addChildElement("ItemID").setValue(item_code);	//商品编码
+					sale.addChildElement("UnitCostPrice").setValue(unit_price);
+					sale.addChildElement("RegularSalesUnitPrice").setValue(sale_price);	//原单价
+					sale.addChildElement("ActualSalesUnitPrice").setValue(unit_price);	//实际单价
+					sale.addChildElement("ExtendedAmount").setValue(zongjia);	//总价
+					sale.addChildElement("Quantity").setValue(qty);	//数量
+					
+					SOAPElement associate = SOAPFactory.newInstance().createElement("Associate");
+					associate.addChildElement("AssociateID").setValue("100");
+					sale.addChildElement(associate);
+					
+					SOAPElement percentageOfItem = SOAPFactory.newInstance().createElement("PercentageOfItem");
+					percentageOfItem.addChildElement("AssociateID").setValue("100");
+					percentageOfItem.addChildElement("Percentage").setValue("1");
+					sale.addChildElement(percentageOfItem);
+					
+					lineItem.addChildElement(sale);
+					retailTransaction.addChildElement(lineItem);
+	
+				}
+			}
+			
+			//付款信息
+			if(paystyle.size()>0){
+				for(int i=0; i<paystyle.size(); i++){
+					JSONObject pay = paystyle.get(i);
+					String money = pay.getString("money");	//支付金额
+					String tendtype = pay.getString("tendtype");	//付款类型
+					String tendid = pay.getString("tendid");
+					SOAPElement lineItem = SOAPFactory.newInstance().createElement("LineItem");
+					lineItem.addChildElement("SequenceNumber").setValue(String.valueOf(num+i+1));
+					lineItem.addChildElement("BeginDateTime").setValue(time2);
+					lineItem.addChildElement("EndDateTime").setValue(time2);
+					
+					SOAPElement tender = SOAPFactory.newInstance().createElement("Tender");
+					tender.setAttribute("TenderType", tendtype);
+					tender.addChildElement("TenderID").setValue(tendid);
+					tender.addChildElement("Amount").setValue(money);
+					lineItem.addChildElement(tender);
+					
+					retailTransaction.addChildElement(lineItem);
+				}
+			}
+			
+			//总金额
+			JSONObject jsonHeader = jsonparam.getJSONObject("order_header");
+			double payable_value = jsonHeader.getDoubleValue("payable_value");
+			double design_cost = jsonHeader.getDoubleValue("design_cost");
+			double install_cost = jsonHeader.getDoubleValue("install_cost");
+			double others_cost = jsonHeader.getDoubleValue("others_cost");
+			double totalValue = payable_value + design_cost + install_cost + others_cost;
+			String total_value = String.valueOf(totalValue);
+			SOAPElement Total = SOAPFactory.newInstance().createElement("Total");
+			Total.setAttribute("TotalType", "TransactionGrandAmount");
+			Total.setValue(total_value);
+			retailTransaction.addChildElement(Total);
+			
+			
+			//会员信息
+			JSONObject customer = jsonparam.getJSONObject("customer");
+			String customerid = customer.getString("customerId");
+			String accountid = customer.getString("accountId");
+			List<String> alternateids = (List<String>)customer.get("alternateIds");
+			String cardnumber = customer.getString("cardNumber");
+			
+			SOAPElement Customer = SOAPFactory.newInstance().createElement("Customer");
+			Customer.addChildElement("CustomerID").setValue(customerid);
+			Customer.addChildElement("AccountNumber").setValue(accountid);
+			for(int i=0; i<alternateids.size(); i++){
+				String alternateID = alternateids.get(i);
+				SOAPElement alternateKey = SOAPFactory.newInstance().createElement("AlternateKey");
+				alternateKey.setAttribute("TypeCode", "XSTORE_ID");
+				alternateKey.addChildElement("AlternateID").setValue(alternateID);
+				Customer.addChildElement(alternateKey);
+			}
+			retailTransaction.addChildElement(Customer);
+			
+			SOAPElement customerAccount = SOAPFactory.newInstance().createElement("CustomerAccount");
+			customerAccount.addChildElement("CardNumber").setValue(cardnumber);
+			SOAPElement loyaltyAccount = SOAPFactory.newInstance().createElement("LoyaltyAccount");
+			loyaltyAccount.setAttribute("TypeCode", "LOYALTY");
+			loyaltyAccount.addChildElement("LoyaltyAccountID").setValue(accountid);
+			customerAccount.addChildElement(loyaltyAccount);
+			
+			retailTransaction.addChildElement(customerAccount);
+			
+			transaction.addChildElement(retailTransaction);
+			
+			//获取机构信息
+			JSONObject extraInformation = jsonparam.getJSONObject("extraInformation");
+			//classCode
+			String classCode = extraInformation.getString("classCode");
+			SOAPElement classCodeEl = SOAPFactory.newInstance().createElement("PosTransactionProperties");
+			classCodeEl.addChildElement("PosTransactionPropertyCode").setValue("ClassCode");
+			classCodeEl.addChildElement("PosTransactionPropertyValue").setValue(classCode);
+			transaction.addChildElement(classCodeEl);
+			
+			//closeTag
+			String closeTag = extraInformation.getString("closeTag");
+			SOAPElement closeTagEl = SOAPFactory.newInstance().createElement("PosTransactionProperties");
+			closeTagEl.addChildElement("PosTransactionPropertyCode").setValue("CloseTag");
+			closeTagEl.addChildElement("PosTransactionPropertyValue").setValue(closeTag);
+			transaction.addChildElement(closeTagEl);
+			
+			//contractNo
+			String contractNo = extraInformation.getString("contractNo");
+			SOAPElement contractNoEl = SOAPFactory.newInstance().createElement("PosTransactionProperties");
+			contractNoEl.addChildElement("PosTransactionPropertyCode").setValue("ContractNo");
+			contractNoEl.addChildElement("PosTransactionPropertyValue").setValue(contractNo);
+			transaction.addChildElement(contractNoEl);
+			
+			//marketName
+			String marketName = extraInformation.getString("marketName");
+			SOAPElement marketNameEl = SOAPFactory.newInstance().createElement("PosTransactionProperties");
+			marketNameEl.addChildElement("PosTransactionPropertyCode").setValue("MarketName");
+			marketNameEl.addChildElement("PosTransactionPropertyValue").setValue(marketName);
+			transaction.addChildElement(marketNameEl);
+			
+			//marketNo
+			String marketNo = extraInformation.getString("marketNo");
+			SOAPElement marketNoEl = SOAPFactory.newInstance().createElement("PosTransactionProperties");
+			marketNoEl.addChildElement("PosTransactionPropertyCode").setValue("MarketNo");
+			marketNoEl.addChildElement("PosTransactionPropertyValue").setValue(marketNo);
+			transaction.addChildElement(marketNoEl);
+			
+			//orderId
+			SOAPElement orderIdEl = SOAPFactory.newInstance().createElement("PosTransactionProperties");
+			orderIdEl.addChildElement("PosTransactionPropertyCode").setValue("OrderId");
+			orderIdEl.addChildElement("PosTransactionPropertyValue").setValue(orderId);
+			transaction.addChildElement(orderIdEl);
+			
+			//shopNo
+			String shopNo = extraInformation.getString("shopNo");
+			SOAPElement shopNoEl = SOAPFactory.newInstance().createElement("PosTransactionProperties");
+			shopNoEl.addChildElement("PosTransactionPropertyCode").setValue("ShopNo");
+			shopNoEl.addChildElement("PosTransactionPropertyValue").setValue(shopNo);
+			transaction.addChildElement(shopNoEl);
+			
+			//tenantCode
+			String tenantCode = extraInformation.getString("tenantCode");
+			SOAPElement tenantCodeEl = SOAPFactory.newInstance().createElement("PosTransactionProperties");
+			tenantCodeEl.addChildElement("PosTransactionPropertyCode").setValue("TenantCode");
+			tenantCodeEl.addChildElement("PosTransactionPropertyValue").setValue(tenantCode);
+			transaction.addChildElement(tenantCodeEl);
+			
+			//tenantName
+			String tenantName = extraInformation.getString("tenantName");
+			SOAPElement tenantNameEl = SOAPFactory.newInstance().createElement("PosTransactionProperties");
+			tenantNameEl.addChildElement("PosTransactionPropertyCode").setValue("TenantName");
+			tenantNameEl.addChildElement("PosTransactionPropertyValue").setValue(tenantName);
+			transaction.addChildElement(tenantNameEl);
+			
+			//tenderType
+			String tenderType = extraInformation.getString("tenderType");
+			SOAPElement tenderTypeEl = SOAPFactory.newInstance().createElement("PosTransactionProperties");
+			tenderTypeEl.addChildElement("PosTransactionPropertyCode").setValue("TenderType");
+			tenderTypeEl.addChildElement("PosTransactionPropertyValue").setValue(tenderType);
+			transaction.addChildElement(tenderTypeEl);
+			
+			//bizCode
+			String bizCode = extraInformation.getString("bizCode");
+			SOAPElement bizCodeEl = SOAPFactory.newInstance().createElement("PosTransactionProperties");
+			bizCodeEl.addChildElement("PosTransactionPropertyCode").setValue("BizCode");
+			bizCodeEl.addChildElement("PosTransactionPropertyValue").setValue(bizCode);
+			transaction.addChildElement(bizCodeEl);
+			
+			//bizDescription
+			String bizDescription = extraInformation.getString("bizDescription");
+			SOAPElement bizDescriptionEl = SOAPFactory.newInstance().createElement("PosTransactionProperties");
+			bizDescriptionEl.addChildElement("PosTransactionPropertyCode").setValue("BizDescription");
+			bizDescriptionEl.addChildElement("PosTransactionPropertyValue").setValue(bizDescription);
+			transaction.addChildElement(bizDescriptionEl);
+			
+			
 			ele.addChildElement(transaction);
 			
 			msg.writeTo(System.out);
+			System.out.println("\n invoking.....");
+			
+			SOAPMessage response;
+
+			response = dispatch.invoke(msg);
+			response.writeTo(System.out);
+			System.out.println();
 			
 		}catch(Exception e){
 			e.printStackTrace();
