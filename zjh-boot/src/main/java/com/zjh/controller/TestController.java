@@ -4,12 +4,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.zjh.model.User;
+
 @RestController
 public class TestController {
 	
-	@GetMapping("/rest")
-	public String helloWorld() {
-		return "helloworld";
+	@GetMapping("/user")
+	public User getUser() {
+		User user = new User();
+		user.setName("zjh");
+		user.setAge(24);
+		user.setSex("男");
+		return user;
 	}
 	
 	@PostMapping("/hello")
