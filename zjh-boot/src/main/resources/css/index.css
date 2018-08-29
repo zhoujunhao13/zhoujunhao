@@ -1,0 +1,7 @@
+@charset "UTF-8";
+.container{
+	height: 100px;
+	width: 30%;
+	text-align:center;//水平居中
+	line-height:100px;//跟高度一样
+}
