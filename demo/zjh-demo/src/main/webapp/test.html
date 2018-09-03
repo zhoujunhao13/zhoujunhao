@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>跨域测试</title>
+</head>
+
+<body>
+    <button id="test" onclick="test()">测试</button>
+    <script type="text/javascript" src="miniui/jquery-1.6.2.min.js"></script>
+    <script type="text/javascript">
+    function test(){
+    	$.ajax({
+            "url": "http://127.0.0.1:8081/fastjson/user",
+            "type": "get",
+            "dataType": "json",
+            "success": function(data) {
+                console.log(data);
+            }
+        })
+    }
+    </script>
+</body>
+
+</html>

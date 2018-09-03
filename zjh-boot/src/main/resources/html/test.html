@@ -8,20 +8,18 @@
 
 <body>
     <button id="test">测试</button>
-    <script type="text/javascript" src="jquery-1.12.3.min.js"></script>
+    <script type="text/javascript" src="miniui/jquery-1.6.2.min.js"></script>
     <script type="text/javascript">
-    $(function() {
-        $("#test").on("click", function() {
-            $.ajax({
-                "url": "http://localhost:8080/fastjson/user",
-                "type": "get",
-                "dataType": "json",
-                "success": function(data) {
-                    console.log(data);
-                }
-            })
-        });
-    });
+       $("#test").on("click", function() {
+           $.ajax({
+               "url": "http://localhost:8080/fastjson/user",
+               "type": "get",
+               "dataType": "json",
+               "success": function(data) {
+                   console.log(data);
+               }
+           })
+       });
     </script>
 </body>
 

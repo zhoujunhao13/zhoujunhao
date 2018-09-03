@@ -1,0 +1,13 @@
+
+.mini-tree-leaf-dep
+{
+    background-image:url(images/tree/leaf_dep.gif);
+}
+.mini-tree-folder-dep
+{
+    background-image:url(images/tree/folder_dep.gif);
+}
+.mini-tree-expand .mini-tree-folder-dep
+{
+    background-image:url(images/tree/folder-open_dep.gif);
+}
