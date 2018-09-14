@@ -5,11 +5,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.io.Reader;
 
 /**
@@ -21,7 +21,9 @@ public class ReadFromFile {
 	
 	public static void main(String[] args) {
 		//readFileByBytes("D:\\我的文档\\Pictures\\狼1.jpg","E:\\lang.jpg");
-		readFileByChars("E:\\账号密码.txt");
+		//readFileByChars("E:\\账号密码.txt");
+		//readFileByLine("E:\\\\账号密码.txt");
+		readFileByRandomAccess("E:\\账号密码.txt");
 	}
 	
 	/**
@@ -108,15 +110,51 @@ public class ReadFromFile {
      */
 	public static void readFileByLine(String fileName) {
 		File file = new File(fileName);
-		BufferedReader reader = null;
+		InputStreamReader reader = null;
 		try {
-			reader = new BufferedReader(new FileReader(file));
-			
+			//reader = new BufferedReader(new FileReader(file));
+			reader = new InputStreamReader(new FileInputStream(file), "utf-8");
+			BufferedReader bufferedReader = new BufferedReader(reader);
+			String tempString = null;
+			int line = 1;
+			while(bufferedReader.ready()) {
+				tempString = bufferedReader.readLine();
+				System.out.println("第"+line+"行："+tempString);
+				line++;
+			}
+			reader.close();
 		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
+	
+	public static void readFileByRandomAccess(String filePath) {
+		RandomAccessFile randomFile = null;
+		try {
+			System.out.println("随机读取一段文件内容");
+			randomFile = new RandomAccessFile(filePath, "r");
+			Long fileLength = randomFile.length();
+			int beginIndex = (fileLength > 4) ? 4 : 0;
+			randomFile.seek(beginIndex);
+			byte[] bytes = new byte[10];
+			int byteread = 0;
+			while((byteread=randomFile.read(bytes)) != -1) {
+				System.out.println((char)byteread);
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}finally {
+            if (randomFile != null)
+                try {
+                    randomFile.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+        }
+	}
 	/**
      * 显示输入流中剩余的字节数
      * @param in
