@@ -7,7 +7,15 @@ import java.util.function.Predicate;
 public class Test {
 	
 	public static void main(String[] args) {
-		language();
+		//language();
+		StringBuffer a = new StringBuffer();
+		StringBuffer b = new StringBuffer();
+		String s = "11.22.33.44";
+		int i = s.lastIndexOf(".");
+		System.out.println(i);
+		a.append(s.substring(0, i));
+		b.append(s.substring(i+1));
+		System.out.println(a+"   "+b);
 	}
 	
 	public static void aa() {

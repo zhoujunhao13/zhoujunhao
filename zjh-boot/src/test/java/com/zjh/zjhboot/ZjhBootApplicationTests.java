@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -16,12 +17,17 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.zjh.controller.TestController;
+import com.zjh.dao.server.GoodsDao;
+import com.zjh.model.GoodsModel;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class ZjhBootApplicationTests {
 	
 	private MockMvc mvc;
+	
+	@Autowired
+	GoodsDao goodsDao;
 	
 	@Before
 	public void setup() throws Exception{
@@ -50,6 +56,12 @@ public class ZjhBootApplicationTests {
 	    // 字符串是否与正则表达式相匹配
 	    boolean rs = matcher.matches();
 	    System.out.println(rs);
+	}
+	
+	@Test
+	public void getGoods() {
+		GoodsModel goodsModel = this.goodsDao.get("003003");
+		System.out.println(goodsModel);
 	}
 
 }

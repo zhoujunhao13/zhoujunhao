@@ -22,6 +22,9 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import com.zjh.Servlet.ServletTest;
+import com.zjh.controller.Reflect;
+import com.zjh.dao.impl.GoodsDaoImpl;
+import com.zjh.dao.server.GoodsDao;
 import com.zjh.filter.TimeFilter;
 import com.zjh.interceptor.TimeInterceptor;
 import com.zjh.listener.ListenerTest;
@@ -81,6 +84,16 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 	@Bean
 	public ServerEndpointExporter serverEndpointExporter() {
 		return new ServerEndpointExporter();
+	}
+	
+	@Bean
+	public Reflect reflect() {
+		return new Reflect();
+	}
+	
+	@Bean(name="goods")
+	public GoodsDao goodsDao() {
+		return new GoodsDaoImpl();
 	}
 
 }
