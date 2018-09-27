@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
+import com.alibaba.fastjson.JSONObject;
 import com.zjh.dao.server.GoodsDao;
 import com.zjh.model.GoodsModel;
+import com.zjh.model.ServiceSession;
 
 public class GoodsDaoImpl implements GoodsDao {
 	
@@ -33,8 +35,9 @@ public class GoodsDaoImpl implements GoodsDao {
 		return 0;
 	}
 
-	@Override
+	
 	public GoodsModel get(String itemCode) {
+		//String itemCode = json.getString("item_code");
 		String sql = "select * from goods where item_code = ?";
 		
 		GoodsModel model =  this.jdbcTemplate.queryForObject(sql, new RowMapper<GoodsModel>() {
@@ -57,6 +60,10 @@ public class GoodsDaoImpl implements GoodsDao {
 		}, itemCode);
 		
 		return model;
+	}
+
+	public void test() {
+		System.out.println("--------test---------");
 	}
 
 }

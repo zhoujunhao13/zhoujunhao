@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,8 +28,9 @@ public class DataController {
 	
 	@RequestMapping("/rest")
 	public String rest(@RequestParam(value="method",required=false) String method, 
-					   @RequestParam(value="session",required=false) String session) {
-		return this.onRestService(method, session, null, null, null, null, null);
+					   @RequestParam(value="session",required=false) String session,
+					   @RequestBody String param) {
+		return this.onRestService(method, session, null, null, null, null, param);
 	}
 
 	public String onRestService(String method,String session,String ent_id,String user_id,String user_name,String locale,String param) {
