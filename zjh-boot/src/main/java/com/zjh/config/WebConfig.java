@@ -14,7 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 
@@ -29,6 +28,7 @@ import com.zjh.filter.TimeFilter;
 import com.zjh.interceptor.TimeInterceptor;
 import com.zjh.listener.ListenerTest;
 
+@SuppressWarnings("deprecation")
 @Configuration
 public class WebConfig extends WebMvcConfigurerAdapter {
 	

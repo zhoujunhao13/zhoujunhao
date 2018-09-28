@@ -7,10 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
-import com.alibaba.fastjson.JSONObject;
 import com.zjh.dao.server.GoodsDao;
 import com.zjh.model.GoodsModel;
-import com.zjh.model.ServiceSession;
 
 public class GoodsDaoImpl implements GoodsDao {
 	

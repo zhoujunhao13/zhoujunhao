@@ -255,7 +255,7 @@ public class Reflect {
     		return classmethod;
     }
     
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes" })
 	private Object invoke(String mode,StringBuffer find,Object objinst,String methodname,Object[] params) throws Exception
 	{
 		Method classmethod = null;
