@@ -2,13 +2,18 @@ package com.zjh.dao.impl;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 
+import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
+import com.alibaba.fastjson.JSONObject;
 import com.zjh.dao.server.GoodsDao;
 import com.zjh.model.GoodsModel;
+import com.zjh.utils.SpringContext;
 
 public class GoodsDaoImpl implements GoodsDao {
 	
@@ -60,8 +65,11 @@ public class GoodsDaoImpl implements GoodsDao {
 		return model;
 	}
 
-	public void test() {
-		System.out.println("--------test---------");
+	public List<Map<String, Object>> test() {
+		SqlSessionTemplate sessionTemplate = SpringContext.getBean("SqlSessionTemplate", SqlSessionTemplate.class);
+		List<Map<String, Object>> list = sessionTemplate.selectList("test.select");
+		System.out.println(list);
+		return list;
 	}
 
 }
