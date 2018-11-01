@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "mybatis-3-config.dtd"[]>
+<configuration>
+
+	<settings>
+		<setting name="callSettersOnNulls" value="true"/>
+	</settings>
+	<!-- 忽略KEY大小写的MAP -->
+	<typeAliases>
+		<typeAlias type="java.util.Map"
+			alias="Map" />
+	</typeAliases>
+	
+
+	<mappers>
+		<mapper resource="beanmapper/test.xml"></mapper>
+	</mappers>
+</configuration>
