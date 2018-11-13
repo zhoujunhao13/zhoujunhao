@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.lowyer.model.ServiceSession;
+import com.lowyer.utils.Utils;
 
 @RestController
 public class DataController {
@@ -51,9 +51,9 @@ public class DataController {
 	        } else if (retdata instanceof String) {
 	        	return (String) retdata;
 	        } else {
-	        	//return JSON.toJSONString(toNormalJSONObject(retdata));
+	        	return JSON.toJSONString(Utils.toNormalJSONObject(retdata));
 	        	//return retdata;
-	        	return JSONObject.toJSONStringWithDateFormat(retdata, "yyyy-MM-dd HH:mm:ss", SerializerFeature.WriteMapNullValue);  
+	        	//return JSONObject.toJSONStringWithDateFormat(retdata, "yyyy-MM-dd HH:mm:ss", SerializerFeature.WriteMapNullValue);  
 	        }
 	    } catch (Exception ex) {
 	        ex.printStackTrace();
@@ -63,13 +63,4 @@ public class DataController {
 	    }
 	}
 	
-	public Object toNormalJSONObject(Object obj) {
-		JSONObject jsondata = null;
-		if(obj instanceof JSONObject) {
-			jsondata = (JSONObject) obj;
-		}else {
-			jsondata = JSON.parseObject(JSONObject.toJSONStringWithDateFormat(obj, "yyyy-MM-dd HH:mm:ss", SerializerFeature.WriteMapNullValue));
-		}
-		return jsondata;
-	}
 }

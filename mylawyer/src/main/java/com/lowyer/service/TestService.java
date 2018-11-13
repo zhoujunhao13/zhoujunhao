@@ -1,9 +1,9 @@
 package com.lowyer.service;
 
-import com.alibaba.fastjson.JSONObject;
+import com.lowyer.model.ServiceResponse;
 
 public interface TestService {
 	
-	public JSONObject search();
+	public ServiceResponse search();
 
 }
