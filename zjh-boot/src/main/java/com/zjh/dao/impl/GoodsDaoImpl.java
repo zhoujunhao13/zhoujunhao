@@ -14,6 +14,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.zjh.dao.server.GoodsDao;
 import com.zjh.model.GoodsModel;
 import com.zjh.utils.SpringContext;
+import com.zjh.utils.UniqueID;
 
 public class GoodsDaoImpl implements GoodsDao {
 	
@@ -70,6 +71,14 @@ public class GoodsDaoImpl implements GoodsDao {
 		List<Map<String, Object>> list = sessionTemplate.selectList("test.select");
 		System.out.println(list);
 		return list;
+	}
+	
+	public JSONObject testGetId() {
+		long id = UniqueID.getUniqueID();
+		JSONObject json = new JSONObject();
+		json.put("id", id);
+		return json;
+		
 	}
 
 }

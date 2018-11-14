@@ -28,7 +28,7 @@ public class DataController {
 	}
 	
 	@RequestMapping("/rest")
-	@ResponseBody
+	//@ResponseBody
 	public String rest(@RequestParam(value="method",required=false) String method, 
 					   @RequestParam(value="session",required=false) String session,
 					   @RequestBody String param) {

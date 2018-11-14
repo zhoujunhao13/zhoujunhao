@@ -11,12 +11,18 @@
     <script type="text/javascript" src="miniui/jquery-1.6.2.min.js"></script>
     <script type="text/javascript">
     function test(){
+    	var param = {};
     	$.ajax({
-            "url": "http://127.0.0.1:8081/fastjson/user",
-            "type": "get",
-            "dataType": "json",
-            "success": function(data) {
+            //"url": "http://127.0.0.1:8081/fastjson/user",
+            url: "/mylaywer/rest?method=test.search",
+            type: "POST",
+            data: param.toString(),
+            dataType: "json",
+            async:false,
+            success: function(data) {
                 console.log(data);
+                var obj = eval('(' + data + ')');
+                console.log(obj);
             }
         })
     }

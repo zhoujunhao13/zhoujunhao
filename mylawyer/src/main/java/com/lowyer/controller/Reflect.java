@@ -5,6 +5,8 @@ import java.lang.reflect.Method;
 import java.net.URLDecoder;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +25,8 @@ public class Reflect {
 	final static String VOID_PARAM = "5";
 	final static String SESSIONMULTIPARTFILE_PARAM = "6";
 	final static String SESSIONOUTPUTSTREAM_PARAM = "7";
+	
+	private static final Logger logger = LoggerFactory.getLogger(Reflect.class);
 	
 	public Reflect()
 	{
@@ -99,6 +103,34 @@ public class Reflect {
 				if (jsonparam == null) { try { jsonparam = JSON.parseObject(param); } catch(Exception ex) { } }
 				retobj = invoke(SESSIONJSON_PARAM,sb,obj,methodname,new Object[]{ null,jsonparam });
 				if (sb.length() > 0) { return retobj; }
+			}
+			
+			if (obj != null) {
+				Method[] methodList = obj.getClass().getMethods();
+				if (methodList != null) {
+					StringBuffer buffer = new StringBuffer();
+
+					for (Method rowMethod:methodList) {
+						if (rowMethod !=null) {
+							if (methodname.equalsIgnoreCase(rowMethod.getName())) {
+								buffer.append(String.format("%1$s(", methodname));
+								
+								Class<?>[] paramsList = rowMethod.getParameterTypes();
+								boolean first = true;
+								for (Class<?> classzz:paramsList) {
+									if (first) {
+										first = false;
+										buffer.append(classzz.getName());
+									} else {
+										buffer.append(","+classzz.getName());
+									}
+								}
+								buffer.append(";\r\n");
+							}
+						}
+					}
+					logger.info(String.format("%1$s.%2$s method not found! but found:%3$s", component,methodname,buffer.toString()));
+				}
 			}
 			
 			throw new Exception(component+"."+methodname+" method not found!");
