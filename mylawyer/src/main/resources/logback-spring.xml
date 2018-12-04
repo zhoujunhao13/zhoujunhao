@@ -40,6 +40,11 @@
     
     <!-- 测试环境 -->
     <springProfile name="test">
+    	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>${PATTERN}</pattern>
+            </encoder>
+        </appender>
         <!-- 每天产生一个文件 -->
         <appender name="TEST-FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <!-- 文件路径 -->
@@ -55,12 +60,18 @@
             </layout>
         </appender>
         <root level="info">
+        	<appender-ref ref="CONSOLE" />
             <appender-ref ref="TEST-FILE" />
         </root>
     </springProfile>
     
     <!-- 生产环境 -->
     <springProfile name="prod">
+    	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>${PATTERN}</pattern>
+            </encoder>
+        </appender>
         <appender name="PROD_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <file>${PRO_FILE_PATH}</file>
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -71,7 +82,8 @@
                 <pattern>${PATTERN}</pattern>
             </layout>
         </appender>
-        <root level="warn">
+        <root level="info">
+        	<appender-ref ref="CONSOLE" />
             <appender-ref ref="PROD_FILE" />
         </root>
     </springProfile>

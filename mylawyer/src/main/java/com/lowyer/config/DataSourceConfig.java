@@ -17,10 +17,20 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.lowyer.utils.UniqueID;
 
 @Configuration
 @EnableAutoConfiguration
 public class DataSourceConfig {
+	
+	@Bean(name = "UniqueID")
+	UniqueID onUniqueIDTemplate() throws Exception {
+		UniqueID instance = new UniqueID();
+		instance.setHostId("120");
+
+		return instance;
+	}
+	
 	@Autowired
 	protected ResourceLoader resourceLoader = new DefaultResourceLoader();
 	

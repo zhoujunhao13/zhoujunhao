@@ -3,11 +3,13 @@ package com.lowyer.config;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -19,6 +21,9 @@ import com.lowyer.controller.Reflect;
 @SuppressWarnings("deprecation")
 @Configuration
 public class WebConfig extends WebMvcConfigurerAdapter {
+	
+	@Value("${imagePath}")
+	String imagePath;
 	
 	@Bean
 	public HttpMessageConverters fastJsonHttpMessageConverts() {
@@ -34,6 +39,12 @@ public class WebConfig extends WebMvcConfigurerAdapter {
         return new HttpMessageConverters(converter);
 	}
 	
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		registry.addResourceHandler("/images/**").addResourceLocations("file:"+imagePath);
+		super.addResourceHandlers(registry);
+	}
+	
 	/*@Bean
 	public Reflect reflect() {
 		return new Reflect();
@@ -43,5 +54,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 	public TestServiceImpl testServiceImpl() {
 		return new TestServiceImpl();
 	}
+	
+
 	
 }

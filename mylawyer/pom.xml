@@ -67,6 +67,14 @@
 		    <artifactId>spring-boot-starter-aop</artifactId>
 		</dependency>
 		
+		<!-- https://mvnrepository.com/artifact/org.springframework.hateoas/spring-hateoas -->
+		<dependency>
+		    <groupId>org.springframework.hateoas</groupId>
+		    <artifactId>spring-hateoas</artifactId>
+		    <version>0.25.0.RELEASE</version>
+		</dependency>
+		
+		
 		<!-- 工具 -->
 		<dependency>
 		    <groupId>commons-io</groupId>
