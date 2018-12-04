@@ -67,6 +67,18 @@
 		    <artifactId>spring-boot-starter-aop</artifactId>
 		</dependency>
 		
+		<!-- 消息 -->
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-activemq</artifactId>
+		</dependency>
+		
+		<!-- 消息，如果需要配置连接池，添加如下依赖 -->
+		<dependency>  
+		    <groupId>org.apache.activemq</groupId>  
+		    <artifactId>activemq-pool</artifactId>  
+		</dependency> 
+		
 		<!-- 工具 -->
 		<dependency>
 		    <groupId>commons-io</groupId>

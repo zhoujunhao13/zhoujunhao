@@ -2,12 +2,14 @@ package com.zjh.controller;
 
 import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.zjh.jms.JmsSender;
 import com.zjh.model.User;
 
 import io.swagger.annotations.Api;
@@ -18,6 +20,9 @@ import io.swagger.annotations.ApiOperation;
 @RestController
 @RequestMapping("test")
 public class TestController {
+	
+	@Autowired
+	JmsSender sender;
 	
 	@GetMapping("/user")
 	public User getUser() {
@@ -46,5 +51,12 @@ public class TestController {
 
         return user;
     }
+	
+	@RequestMapping("/queue")
+	public void testSendByQueue() {
+		for (int i = 1; i < 6; i++) {
+            this.sender.sendByQueue("hello activemq queue " + i);
+        }
+	}
 
 }
