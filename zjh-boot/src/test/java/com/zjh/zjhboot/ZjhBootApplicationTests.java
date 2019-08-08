@@ -19,9 +19,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.zjh.controller.TestController;
 import com.zjh.dao.server.GoodsDao;
-import com.zjh.jms.JmsSender;
 import com.zjh.model.GoodsModel;
-import com.zjh.utils.SpringContext;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -37,8 +35,8 @@ public class ZjhBootApplicationTests {
 	@Autowired
 	GoodsDao goodsDao;
 	
-	@Autowired
-	JmsSender sender;
+	/*@Autowired
+	JmsSender sender;*/
 	
 	@Before
 	public void setup() throws Exception{
@@ -74,7 +72,7 @@ public class ZjhBootApplicationTests {
 		GoodsModel goodsModel = this.goodsDao.get("003003");
 		System.out.println(goodsModel);
 	}
-	
+	/*
 	@Test
 	public void testSenderByQueue() {
 		for(int i=0;i<5;i++) {
@@ -88,5 +86,5 @@ public class ZjhBootApplicationTests {
 			this.sender.sendByTolic("hello topic"+i);
 		}
 	}
-
+*/
 }

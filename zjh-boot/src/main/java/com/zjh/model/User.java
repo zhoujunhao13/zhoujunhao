@@ -5,6 +5,9 @@ import java.util.Date;
 import com.alibaba.fastjson.annotation.JSONField;
 
 public class User {
+
+	private Long id;
+	
 	private String name;
 	
 	private Integer age;
@@ -13,6 +16,14 @@ public class User {
 	
 	@JSONField(format="yyyy-MM-dd HH:mm:ss")
 	private Date createDate;
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
 
 	public String getName() {
 		return name;
@@ -45,5 +56,11 @@ public class User {
 	public void setCreateDate(Date createDate) {
 		this.createDate = createDate;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "User [id=" + id + ", name=" + name + ", age=" + age + ", sex=" + sex + ", createDate=" + createDate
+				+ "]";
+	}
+
 }

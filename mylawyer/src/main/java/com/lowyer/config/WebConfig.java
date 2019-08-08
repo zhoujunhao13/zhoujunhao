@@ -17,7 +17,6 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import com.lowyer.component.TestServiceImpl;
-import com.lowyer.controller.Reflect;
 
 @SuppressWarnings("deprecation")
 @Configuration

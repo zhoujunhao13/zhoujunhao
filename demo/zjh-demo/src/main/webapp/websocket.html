@@ -62,11 +62,11 @@
         function connection(userName) {
             var host = window.location.host;
             if ('WebSocket' in window) {
-                websocket = new WebSocket("ws://172.17.10.93:8081" +
+                websocket = new WebSocket("ws://47.92.100.54" +
                     "/webSocketServer/" + userName);
             } else if ('MozWebSocket' in window) {
-                websocket = new MozWebSocket("ws://172.17.10.93:8081" +
-                    "/webSocketServer/" + userName);
+                websocket = new MozWebSocket("ws://47.92.100.54" +
+                    "/webSocketServer/" + UserId);
             }
             websocket.onopen = function(evnt) {
                 $("#tou").html("链接服务器成功!")

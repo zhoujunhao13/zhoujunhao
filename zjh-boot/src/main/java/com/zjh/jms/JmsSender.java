@@ -1,5 +1,5 @@
 package com.zjh.jms;
-
+/*
 import javax.jms.Queue;
 import javax.jms.Topic;
 
@@ -28,3 +28,4 @@ public class JmsSender {
 	}
 
 }
+*/

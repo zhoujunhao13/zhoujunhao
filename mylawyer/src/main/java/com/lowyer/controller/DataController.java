@@ -1,13 +1,15 @@
 package com.lowyer.controller;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
@@ -31,14 +33,18 @@ public class DataController {
 	//@ResponseBody
 	public String rest(@RequestParam(value="method",required=false) String method, 
 					   @RequestParam(value="session",required=false) String session,
-					   @RequestBody String param) {
-		return this.onRestService(method, session, null, null, null, null, param);
+					   @RequestBody String param,HttpServletRequest request) {
+		ServiceSession serviceSession = ServiceSession.getServiceSession(request.getSession());
+		/*if(serviceSession == null) {
+			return "未登录";
+		}*/
+		return this.onRestService(method, JSON.toJSONString(serviceSession), null, null, param);
 	}
 
-	public String onRestService(String method,String session,String ent_id,String user_id,String user_name,String locale,String param) {
-		LOGGER.info(String.format("---->method=%1$s session=%2$s param=%3$s ent_id=%4$s user_id=%5$s user_name=%6$s locale=%7$s",method+"",session+"",param+"",ent_id+"",user_id+"",user_name+"",locale+""));
+	public String onRestService(String method,String session,String user_id,String user_name,String param) {
+		LOGGER.info(String.format("---->method=%1$s session=%2$s param=%3$s user_id=%4$s user_name=%5$s",method+"",session+"",param+"",user_id+"",user_name+""));
 	    try {
-	        if (StringUtils.isEmpty(session) && !StringUtils.isEmpty(ent_id)) {
+	        if (StringUtils.isEmpty(session)) {
 	            ServiceSession ss = new ServiceSession();
 	            session = JSON.toJSONString(ss);
 	        }
@@ -61,6 +67,14 @@ public class DataController {
 	    	json.put("msg", ex.getMessage());
 	        return json.toJSONString();
 	    }
+	}
+	
+	@RequestMapping(value="/login",method=RequestMethod.POST)
+	public String login(@RequestBody(required=true) String param,HttpServletRequest request) {
+		JSONObject json = JSONObject.parseObject(param);
+		request.getSession().setAttribute("userId", json.getLong("userId"));
+		request.getSession().setAttribute("userName", json.getString("userName"));
+		return "登陆成功";
 	}
 	
 }

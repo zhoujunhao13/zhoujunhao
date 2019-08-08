@@ -26,6 +26,86 @@
             }
         })
     }
+    
+    function WriteLog(sWrite)
+    {
+    	var logDir = 'C:\\orderLogs';
+    	var fso,tf;
+    	fso = new ActiveXObject("Scripting.FileSystemObject");//获取对象
+    	if (!fso.FolderExists(logDir)){
+   		   // 创建文件夹
+   		   fso.CreateFolder(logDir);
+   		}
+    	var logname = getWeek()+'_log.txt';
+    	var myDate = new Date();
+    	var logPath = 'C:\\orderLogs\\'+logname;
+    	if (fso.FileExists(logPath)){
+    		var f=fso.GetFile(logPath);
+    		var d=f.DateLastModified;
+    		var Mdate=new Date(d);
+    		if(getNowFormatDate(myDate) != getNowFormatDate(Mdate)){
+    			f.Delete();
+    		}
+    	}
+    	tf = fso.OpenTextFile(logPath,8,true);//没有便创建文件，8代表追加文件。
+    	tf.WriteLine(myDate.getHours()+":"+myDate.getMinutes()+":"+myDate.getSeconds());					//写一行,并使文件结尾跳到新的一行
+    	tf.WriteLine(sWrite);						//文件结尾在当前行的下一行开头处。		
+    	tf.Write("");								//文件结尾就在当前行的最后一个字符后面
+    	tf.Close();									//关闭文件
+    }
+     
+    $(function(){
+    	try{
+	    	WriteLog("下单");
+	    	WriteLog("提交订单");
+    	}catch(e){
+    		alert('11');
+    	}
+    	alert('22');
+    });
+    
+    function getNowFormatDate(date) {
+        var seperator1 = "-";
+        var year = date.getFullYear();
+        var month = date.getMonth() + 1;
+        var strDate = date.getDate();
+        if (month >= 1 && month <= 9) {
+            month = "0" + month;
+        }
+        if (strDate >= 0 && strDate <= 9) {
+            strDate = "0" + strDate;
+        }
+        var currentdate = year + seperator1 + month + seperator1 + strDate;
+        return currentdate;
+    }
+    
+    function getWeek(){
+    	var str = "";  
+    	var week = new Date().getDay();  
+    	if (week == 0) {  
+    	        str = "Sunday";  
+    	} else if (week == 1) {  
+    	        str = "Monday";  
+    	} else if (week == 2) {  
+    	        str = "Tuesday";  
+    	} else if (week == 3) {  
+    	        str = "Wednesday";  
+    	} else if (week == 4) {  
+    	        str = "Thursday";  
+    	} else if (week == 5) {  
+    	        str = "Friday";  
+    	} else if (week == 6) {  
+    	        str = "Saturday";  
+    	} 
+    	return str;
+    }
+
+    var test = {
+        a: [1, 2],
+        b: [3, 4]
+    }
+
+
     </script>
 </body>
 

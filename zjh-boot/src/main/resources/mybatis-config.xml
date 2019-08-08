@@ -3,6 +3,13 @@
 <configuration>
 
 	<settings>
+		<!-- 要使延迟加载生效必须配置下面两个属性 -->
+		<setting name="lazyLoadingEnabled" value="true"/>
+		<setting name="aggressiveLazyLoading" value="false"/>
+		
+		<!-- mybatis 二级缓存 -->
+		<setting name="cacheEnabled" value="true"/>
+		
 		<setting name="callSettersOnNulls" value="true"/>
 	</settings>
 	<!-- 忽略KEY大小写的MAP -->

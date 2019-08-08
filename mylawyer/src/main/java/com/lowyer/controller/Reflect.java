@@ -25,6 +25,7 @@ public class Reflect {
 	final static String VOID_PARAM = "5";
 	final static String SESSIONMULTIPARTFILE_PARAM = "6";
 	final static String SESSIONOUTPUTSTREAM_PARAM = "7";
+	final static String JSONOBJECT_PARAM = "8";
 	
 	private static final Logger logger = LoggerFactory.getLogger(Reflect.class);
 	
@@ -53,7 +54,7 @@ public class Reflect {
 			{
 				//部分URL请求是被编码的
 				session=URLDecoder.decode(session,"utf-8");
-				ServiceSession sessionobj = JSON.parseObject(session,ServiceSession.class);	
+				ServiceSession sessionobj = JSON.parseObject(session,ServiceSession.class);
 				
 				// ServiceSession,String
                 retobj = invoke(SESSIONSTRING_PARAM,sb,obj,methodname,new Object[]{ sessionobj,param });
@@ -70,6 +71,10 @@ public class Reflect {
 				
 				// void
 				retobj = invoke(VOID_PARAM,sb,obj,methodname,null);
+				if (sb.length() > 0) { return retobj; }
+				
+				//jsonobject
+				retobj = invoke(JSONOBJECT_PARAM,sb,obj,methodname,new Object[]{ JSON.parseObject(param) });
 				if (sb.length() > 0) { return retobj; }
 			}
 			else
@@ -102,6 +107,11 @@ public class Reflect {
 				// ServiceSession,JSONObject
 				if (jsonparam == null) { try { jsonparam = JSON.parseObject(param); } catch(Exception ex) { } }
 				retobj = invoke(SESSIONJSON_PARAM,sb,obj,methodname,new Object[]{ null,jsonparam });
+				if (sb.length() > 0) { return retobj; }
+				
+				//jsononject
+				if (jsonparam == null) { try { jsonparam = JSON.parseObject(param); } catch(Exception ex) { } }
+				retobj = invoke(JSONOBJECT_PARAM,sb,obj,methodname,new Object[]{jsonparam });
 				if (sb.length() > 0) { return retobj; }
 			}
 			
@@ -297,7 +307,10 @@ public class Reflect {
 	        String className = cl.getName();
 	        System.out.println("className:"+className);
 	        
-			if (mode.equalsIgnoreCase(SESSIONJSON_PARAM)) {
+	        if (mode.equalsIgnoreCase(JSONOBJECT_PARAM)) {
+				//classmethod = cl.getMethod(methodname, new java.lang.Class[]{ ServiceSession.class,JSONObject.class });
+				classmethod = this.getMethod(cl,methodname, new java.lang.Class[]{JSONObject.class });
+			}else if (mode.equalsIgnoreCase(SESSIONJSON_PARAM)) {
 				//classmethod = cl.getMethod(methodname, new java.lang.Class[]{ ServiceSession.class,JSONObject.class });
 				classmethod = this.getMethod(cl,methodname, new java.lang.Class[]{ ServiceSession.class,JSONObject.class });
 			} else if (mode.equalsIgnoreCase(SESSIONSTRING_PARAM)) {

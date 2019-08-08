@@ -1,6 +1,6 @@
 package com.zjh.jms;
 
-import org.springframework.jms.annotation.JmsListener;
+/*import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
 import com.zjh.config.JmsConfirguration;
@@ -18,4 +18,4 @@ public class JmsReceiver {
 		System.out.println("接受主题消息:"+message);
 	}
 
-}
+}*/

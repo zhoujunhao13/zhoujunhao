@@ -8,7 +8,7 @@ import org.apache.activemq.command.ActiveMQTopic;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
+//@Configuration
 public class JmsConfirguration {
 	
 	public static final String QUEUE_NAME = "activemq_queue";
